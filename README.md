@@ -1,5 +1,2 @@
 # test_repo
-test ,12w12312
-
-testing
-testing 123
+prod testing 1,2,3 
