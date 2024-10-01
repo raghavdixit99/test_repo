@@ -1,3 +1,2 @@
 import os
-var = "blah blah"
-var2 = "asas"
+var2 = "fixed fixed"
