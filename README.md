@@ -1,4 +1,2 @@
 # test_repo
-prod 12
-
-test
+prod 1,2,3
