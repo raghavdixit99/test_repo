@@ -1,7 +1,3 @@
 # test_repo
 prod test
-test
-
-test 1
-
-ytest 2
+test 1,2,3 
