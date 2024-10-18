@@ -32,7 +32,9 @@ def download_model_to_folder():
         token=hf_token,
     )
 
-    AutoTokenizer.from_pretrained(
+
+    ascascasas
+    AutoTokenasasxasddcadcizer.from_pretrained(
         BASE_MODEL, trust_remote_code=True, token=hf_token, cache_dir=MODEL_DIR
     )
 
