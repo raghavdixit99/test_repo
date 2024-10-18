@@ -7,6 +7,8 @@ permissions:
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  # pull_request_review_comment:
+  #   types: [created]
 
 jobs:
   git-diff-review:
@@ -16,15 +18,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Authenticate Docker with GitHub Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull and run Git Diff Review Docker Action
-        run: |
-          docker run --platform linux/amd64 \
-            -e GITHUB_REPOSITORY="${{ github.repository }}" \
-            -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-            -e PR_NUMBER="${{ github.event.pull_request.number }}" \
-            -e EVENT_TYPE="${{ github.event_name }}" \
-            -e ACTION_TYPE="${{ github.event.action }}" \
-            ghcr.io/entelligence-ai/pr_reviewer_raghav:v3
+      - name: Run Git Diff Review Docker Action
+        uses: docker://ghcr.io/entelligence-ai/pr_reviewer_raghav:v3
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EVENT_TYPE: ${{ github.event_name }}
+          ACTION_TYPE: ${{ github.event.action }}
