@@ -1,29 +1,28 @@
+name: PR Reviewer v2
 
-  name: Code Review
+permissions:
+  contents: read
+  pull-requests: write
 
-  permissions:
-    contents: read
-    pull-requests: write
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  # pull_request_review_comment:
+  #   types: [created]
 
-  on:
-    pull_request:
-    pull_request_review_comment:
-      types: [created]
+jobs:
+  git-diff-review:
+    runs-on: ubuntu-latest
 
-  concurrency:
-    group:
-      ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}-${{ github.event_name == 'pull_request_review_comment' && 'pr_comment' || 'pr' }}
-    cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-  jobs:
-    review:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: Entelligence-AI/entelligence-pr-reviewer@latest
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          with:
-            debug: false
-            review_simple_changes: false
-            review_comment_lgtm: false
+      - name: Run Git Diff Review Docker Action
+        uses: docker://ghcr.io/entelligence-ai/pr_reviewer_raghav:v3
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EVENT_TYPE: ${{ github.event_name }}
+          ACTION_TYPE: ${{ github.event.action }}
