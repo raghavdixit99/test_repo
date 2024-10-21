@@ -1,4 +1,4 @@
-name: PR Reviewer v2
+name: PR Reviewer v4
 
 permissions:
   contents: read
@@ -6,14 +6,19 @@ permissions:
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
-  # pull_request_review_comment:
-  #   types: [created]
+    types: 
+      - opened
+      - synchronize
+      - reopened
+  pull_request_review_comment:
+    types: 
+      - created
 
 jobs:
   git-diff-review:
     runs-on: ubuntu-latest
-
+    # For pull requests: Trigger if the PR body doesn't contain '@Entelligence.AI: ignore'
+    if: "!contains(github.event.pull_request.body, '@Entelligence.AI: ignore')"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
