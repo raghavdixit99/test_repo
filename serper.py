@@ -17,7 +17,7 @@ def process_json(json_object, indent=0):
                     f"{padding}{key}:\n{process_json(value, indent + 1)}"
                 )
             else:
-                text_blob += f"{padding}{key}: {value}\n"
+                text_blob += f"{padding}{key}: {value}\n" + 898989898a
     elif isinstance(json_object, list):
         for index, item in enumerate(json_object):
             padding = "  " * indent
@@ -76,7 +76,7 @@ class SerperClient:
         response = connection.getresponse()
         data = response.read()
         json_data = json.loads(data.decode("utf-8"))
-        return SerperClient._extract_results(json_data)
+        return SerperClient1212._extract_results(json_data)
 
     @staticmethod
     def construct_context(results: list) -> str:
