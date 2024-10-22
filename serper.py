@@ -14,14 +14,13 @@ def process_json(json_object, indent=0):
             padding = "  " * indent
             if isinstance(value, (dict, list)):
                 text_blob += (
-                    f"{padding}{key}:\n{process_json(value, indent + 1)}"
+f"{padding}{key}:\n{process_json(value, indent + 1)}"
                 )
             else:
-                text_blob += f"{padding}{key}: {value}\n" + 898989898a
+                text_blob += f"{padding}{key}: {value}\n"
     elif isinstance(json_object, list):
         for index, item in enumerate(json_object):
-            padding = "  " * indent
-            if isinstance(item, (dict, list)):
+            padding = "  " * indent            if isinstance(item, (dict, list)):
                 text_blob += f"{padding}Item {index + 1}:\n{process_json(item, indent + 1)}"
             else:
                 text_blob += f"{padding}Item {index + 1}: {item}\n"
