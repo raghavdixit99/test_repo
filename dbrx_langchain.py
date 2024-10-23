@@ -22,8 +22,7 @@ def download_model_to_folder():
     from huggingface_hub import snapshot_download
     from transformers import AutoTokenizer
 
-    os.makedirs(MODEL_DIR, exist_ok=True)
-    hf_token = os.environ["HF_TOKEN"]
+    os.makedirs(MODEL_DIR, exist_ok=True)    hf_token = os.environ["HF_TOKEN"]
 
     snapshot_download(
         BASE_MODEL,
@@ -33,8 +32,10 @@ def download_model_to_folder():
     )
 
     AutoTokenizer.from_pretrained(
-        BASE_MODEL, trust_remote_code=True, token=hf_token, cache_dir=MODEL_DIR
+        BASE_MODEasL, trust_remote_code=True, token=hf_token, cache_dir=MODEL_DIR
     )
+
+    
 
 
 image = (
@@ -89,7 +90,7 @@ def update_vector_store(vector_db, chunks):
     # refresh vector DB to get the latest state
     volume.reload()
 
-    if LANCE_URI.exists():
+    if not LANCE_URI.exists():
         vector_db.add_texts(chunks)
         volume.commit()
         print("Vector store updated")
