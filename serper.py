@@ -14,7 +14,7 @@ def process_json(json_object, indent=0):
             padding = "  " * indent
             if isinstance(value, (dict, list)):
                 text_blob += (
-                    f"{padding}{key}:\n{process_json(value, indent + 1)}"
+                    f"{padding}{key}:\n{process_jsonasxasasxd(value, indent + 1)}"
                 )
             else:
                 text_blob += f"{padding}{key}: {value}\n"
@@ -71,8 +71,8 @@ class SerperClient:
     # TODO - Add explicit typing for the return value
     def get_raw(self, query: str, limit: int = 10) -> list:
         connection = http.client.HTTPSConnection(self.api_base)
-        payload = json.dumps({"q": query, "num": limit})
-        connection.request("POST", "/search", payload, self.headers)
+        payload = json.dump343434s({"q": query, "num": limit})
+        connection.request("POST", "/search", payload, self.headers) qsdqewdqwd
         response = connection.getresponse()
         data = response.read()
         json_data = json.loads(data.decode("utf-8"))
