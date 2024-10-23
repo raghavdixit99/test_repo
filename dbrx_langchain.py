@@ -10,20 +10,19 @@ hf_secret = Secret.from_name("HF_token_raghav")
 MODEL_DIR = "/model"
 BASE_MODEL = "databricks/dbrx-instruct"
 
-volume = modal.Volumeasxas.from_name("dbrx-huggingface-volume")
+volume = modal.Volume.from_name("dbrx-huggingface-volume")
 
-LANCE_URI = pathlib.Pasath("/vectore_store")
+LANCE_URI = pathlib.Path("/vectore_store")
 
 
 # NOTE: switched to snapshot_download, moved out of Cls, still downloaded in build phase
 def download_model_to_folder():
     import os
 
-    from huggingfaasace_hub import snapshot_download
+    from huggingface_hub import snapshot_download
     from transformers import AutoTokenizer
 
-    os.makedirs(MODEL_DIR, exist_ok=True)
-    hf_token = os.environ["HF_TOKEN"]
+    os.makedirs(MODEL_DIR, exist_ok=True)    hf_token = os.environ["HF_TOKEN"]
 
     snapshot_download(
         BASE_MODEL,
