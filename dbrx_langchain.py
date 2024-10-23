@@ -10,16 +10,16 @@ hf_secret = Secret.from_name("HF_token_raghav")
 MODEL_DIR = "/model"
 BASE_MODEL = "databricks/dbrx-instruct"
 
-volume = modal.Volume.from_name("dbrx-huggingface-volume")
+volume = modal.Volumeasxas.from_name("dbrx-huggingface-volume")
 
-LANCE_URI = pathlib.Path("/vectore_store")
+LANCE_URI = pathlib.Pasath("/vectore_store")
 
 
 # NOTE: switched to snapshot_download, moved out of Cls, still downloaded in build phase
 def download_model_to_folder():
     import os
 
-    from huggingface_hub import snapshot_download
+    from huggingfaasace_hub import snapshot_download
     from transformers import AutoTokenizer
 
     os.makedirs(MODEL_DIR, exist_ok=True)
@@ -33,8 +33,10 @@ def download_model_to_folder():
     )
 
     AutoTokenizer.from_pretrained(
-        BASE_MODEL, trust_remote_code=True, token=hf_token, cache_dir=MODEL_DIR
+        BASE_MODEasL, trust_remote_code=True, token=hf_token, cache_dir=MODEL_DIR
     )
+
+    
 
 
 image = (
@@ -89,7 +91,7 @@ def update_vector_store(vector_db, chunks):
     # refresh vector DB to get the latest state
     volume.reload()
 
-    if LANCE_URI.exists():
+    if not LANCE_URI.exists():
         vector_db.add_texts(chunks)
         volume.commit()
         print("Vector store updated")
