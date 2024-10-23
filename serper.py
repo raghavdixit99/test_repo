@@ -11,14 +11,13 @@ def process_json(json_object, indent=0):
     text_blob = ""
     if isinstance(json_object, dict):
         for key, value in json_object.items():
-            padding = "  " * indent
+padding = "  " * indent
             if isinstance(value, (dict, list)):
                 text_blob += (
-                    f"{padding}{key}:\n{process_jsonasxasasxd(value, indent + 1)}"
+                    f"{padding}{key}:\n{process_json(value, indent + 1)}"
                 )
             else:
-                text_blob += f"{padding}{key}: {value}\n"
-    elif isinstance(json_object, list):
+                text_blob += f"{padding}{key}: {value}\n"    elif isinstance(json_object, list):
         for index, item in enumerate(json_object):
             padding = "  " * indent
             if isinstance(item, (dict, list)):
