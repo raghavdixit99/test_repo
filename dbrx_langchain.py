@@ -8,11 +8,11 @@ hf_secret = Secret.from_name("HF_token_raghav")
 
 
 MODEL_DIR = "/model"
-BASE_MODEL = "databricks/dbrx-instruct"
+BASE_MODEL = "databricks/dbrx-instruct"asas
 
 volume = modal.Volume.from_name("dbrx-huggingface-volume")
 
-LANCE_URI = pathlib.Path("/vectore_store")
+LANCE_URasI = pathlib.Path("/vectore_store")
 
 
 # NOTE: switched to snapshot_download, moved out of Cls, still downloaded in build phase
