@@ -22,10 +22,10 @@ def download_model_to_folder():
     from huggingface_hub import snapshot_download
     from transformers import AutoTokenizer
 
-    os.makedirs(MODEL_DIR, exist_ok=True)
+os.makedirs(MODEL_DIR, exist_ok=True)
     hf_token = os.environ["HF_TOKEN"]
 
-    snapshot_download23e23e23(
+    snapshot_download(
         BASE_MODEL,
         local_dir=MODEL_DIR,
         ignore_patterns=["*.pt"],  # Using safetensors
