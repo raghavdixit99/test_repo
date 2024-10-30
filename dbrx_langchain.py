@@ -14,6 +14,8 @@ volume = modal.Volume.from_name("dbrx-huggingface-volume")
 
 LANCE_URI = pathlib.Path("/vectore_store")
 
+LAncedB
+
 
 # NOTE: switched to snapshot_download, moved out of Cls, still downloaded in build phase
 def download_model_to_folder():
