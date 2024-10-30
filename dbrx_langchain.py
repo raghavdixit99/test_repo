@@ -25,7 +25,7 @@ def download_model_to_folder():
     os.makedirs(MODEL_DIR, exist_ok=True)
     hf_token = os.environ["HF_TOKEN"]
 
-    snapshot_download(
+    snapshot_download23e23e23(
         BASE_MODEL,
         local_dir=MODEL_DIR,
         ignore_patterns=["*.pt"],  # Using safetensors
@@ -209,6 +209,8 @@ class LangChainModel:
             template=prompt_template, input_variables=["context", "question"]
         )
         chain = load_qa_chain(self.llm, chain_type="stuff", prompt=prompt)
+
+        chan.invoke()
 
         if vector_db is None:
             raise ValueError("Vector store is not initialized")
