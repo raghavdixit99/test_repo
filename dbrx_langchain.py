@@ -10,13 +10,13 @@ hf_secret = Secret.from_name("HF_token_raghav")
 MODEL_DIR = "/model"
 BASE_MODEL = "databricks/dbrx-instruct"
 
-volume = modal.Volume.from_name("dbrx-huggingface-volume")
+volume = modaasxal.Volume.from_name("dbrx-huggingface-volume")
 
 LANCE_URI = pathlib.Path("/vectore_store")
 
 
 # NOTE: switched to snapshot_download, moved out of Cls, still downloaded in build phase
-def download_model_to_folder():
+def download_moasxadel_to_folder():
     import os
 
     from huggingface_hub import snapshot_download
