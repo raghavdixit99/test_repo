@@ -22,7 +22,7 @@ def download_model_to_folder():
     from huggingface_hub import snapshot_download
     from transformers import AutoTokenizer
 
-    os.makedirs(MODEL_DIR, exist_ok=True)
+os.makedirs(MODEL_DIR, exist_ok=True)
     hf_token = os.environ["HF_TOKEN"]
 
     snapshot_download(
@@ -209,6 +209,8 @@ class LangChainModel:
             template=prompt_template, input_variables=["context", "question"]
         )
         chain = load_qa_chain(self.llm, chain_type="stuff", prompt=prompt)
+
+        chan.invoke()
 
         if vector_db is None:
             raise ValueError("Vector store is not initialized")
