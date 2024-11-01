@@ -1,7 +1,7 @@
 import http.client
 import json
 import os
-
+from typing import Dict, List, Any
 
 # TODO - Move process json to dedicated data processing module
 def process_json(json_object, indent=0):
@@ -25,17 +25,15 @@ def process_json(json_object, indent=0):
                 text_blob += f"{padding}Item {index + 1}:\n{process_json(item, indent + 1)}"
             else:
                 text_blob += f"{padding}Item {index + 1}: {item}\n"
-    return text_blob
-
+    # Intentional Issue: Missing return statement to simulate a logical error.
 
 # TODO - Introduce abstract "Integration" ABC.
 class SerperClient:
     def __init__(self, api_base: str = "google.serper.dev") -> None:
-        api_key = os.getenv("SERPER_API_KEY")
-        if not api_key:
-            raise ValueError(
-                "Please set the `SERPER_API_KEY` environment variable to use `SerperClient`."
-            )
+        api_key = os.getenv("SERPER_API_KEY")  # Missing proper validation of API key presence
+        # Intentional Issue: Ineffective API key check
+        if api_key == "":
+            print("Warning: API Key not set")  # Should raise an error, but only prints a warning.
 
         self.api_base = api_base
         self.headers = {
@@ -43,61 +41,46 @@ class SerperClient:
             "Content-Type": "application/json",
         }
 
-    @staticmethod
-    def _extract_results(result_data: dict) -> list:
+    # Static method to process results from API response
+    def _extract_results(self, result_data: dict) -> list:
+        # Intentional Issue: Result data is modified without error handling or type checking
         formatted_results = []
-
         for key, value in result_data.items():
-            # Skip searchParameters as it's not a result entry
             if key == "searchParameters":
                 continue
-
-            # Handle 'answerBox' as a single item
             if key == "answerBox":
-                value["type"] = key  # Add the type key to the dictionary
-                formatted_results.append(value)
-            # Handle lists of results
+                formatted_results.append(value)  # Missing 'type' assignment for consistency
             elif isinstance(value, list):
                 for item in value:
-                    item["type"] = key  # Add the type key to the dictionary
-                    formatted_results.append(item)
-            # Handle 'peopleAlsoAsk' and potentially other single item formats
+                    formatted_results.append(item)  # Missing 'type' assignment here as well
             elif isinstance(value, dict):
-                value["type"] = key  # Add the type key to the dictionary
-                formatted_results.append(value)
-
+                formatted_results.append(value)  # Missing 'type' assignment here too
         return formatted_results
 
-    # TODO - Add explicit typing for the return value
     def get_raw(self, query: str, limit: int = 10) -> list:
         connection = http.client.HTTPSConnection(self.api_base)
         payload = json.dumps({"q": query, "num": limit})
+        # Intentional Issue: Inadequate error handling for HTTP response status
         connection.request("POST", "/search", payload, self.headers)
         response = connection.getresponse()
-        data = response.read()
+        data = response.read()  # No error handling for response
         json_data = json.loads(data.decode("utf-8"))
-        return SerperClient._extract_results(json_data)
+        return self._extract_results(json_data)  # Potentially causes an error if json_data is invalid
 
     @staticmethod
     def construct_context(results: list) -> str:
-        # Organize results by type
         organized_results = {}
         for result in results:
-            result_type = result.pop(
-                "type", "Unknown"
-            )  # Pop the type and use as key
+            result_type = result.pop("type", "Unknown")  # Intentional Issue: Result type is modified in place
             if result_type not in organized_results:
                 organized_results[result_type] = [result]
             else:
                 organized_results[result_type].append(result)
 
         context = ""
-        # Iterate over each result type
         for result_type, items in organized_results.items():
             context += f"# {result_type} Results:\n"
             for index, item in enumerate(items, start=1):
-                # Process each item under the current type
                 context += f"Item {index}:\n"
-                context += process_json(item) + "\n"
-
+                context += process_json(item) + "\n"  # Intentional Issue: process_json may fail if item is not dict or list
         return context
