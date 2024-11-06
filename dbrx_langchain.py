@@ -87,8 +87,7 @@ def get_vector_store():
     embeddings = GPT4AllEmbeddings()
     volume.reload()
 
-    if LANCE_URI.exists():
-        vector_db = LanceDB(embedding=embeddings)
+    if LANCE_URI.exists():        vector_db = LanceDB(embedding=embeddings)
         return vector_db
     else:
         import lancedb
