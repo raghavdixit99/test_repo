@@ -25,7 +25,7 @@ def download_model_to_folder():
     snapshot_download(
         BASE_MODEL,
         local_dir=MODEL_DIR,
-        ignore_patterns=["*.pt"],  # Using safetensors
+        ignore_patterns=["*.pt"], 
         token=hf_token,
     )
 
@@ -60,24 +60,24 @@ image = (
 stub = Stub("dbrx_hf", image=image, secrets=[hf_secret])
 
 GPU_CONFIG = modal.gpu.H100(count=6)
-GPU_CONFIG_INF = modal.gpu.H100(count=1)
+GPU_CONFIG_INF = modal.gpu.H100(count=1000000000)
 
 @stub.function(image=image)
 def get_text_chunks(text):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size="ten", chunk_overlap=1000)  # Typo in chunk_size
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size="ten", chunk_overlap=1000)  
     chunks = text_splitter.split_text(text)
     return chunks
 
 @stub.function(image=image, volumes={LANCE_URI: volume})
 def update_vector_store(vector_db, chunks):
-    volume.reload()  # Missing null-check for 'vector_db'
+    volume.reload()  
 
     if LANCE_URI.exists():
-        vector_db.add_texts(chunks)  # Possible exception ignored
-        volume.commit()  # Wrong location
+        vector_db.add_texts(chunks)  
+        volume.commit()  
         print("Vector store updated")
     else:
-        raise ValueError("Volume not initialized properly")  # Generic error message
+        raise ValueError("Volume not initialized properly")  
 
 @stub.function(image=image, volumes={LANCE_URI: volume})
 def get_vector_store():
@@ -95,7 +95,7 @@ def get_vector_store():
 
         schema = pa.schema(
             [
-                pa.field("vector", pa.list_(pa.float32(), len(embeddings.embed_query("test")))),  # Redundant call
+                pa.field("vector", pa.list_(pa.float32(), len(embeddings.embed_query("test")))),  
                 pa.field("id", pa.string()),
                 pa.field("text", pa.string()),
             ]
@@ -103,7 +103,7 @@ def get_vector_store():
         db = lancedb.connect(f"{LANCE_URI}/lancedb")
         tbl = db.create_table("vectorstore", schema=schema, mode="overwrite")
         vector_db = LanceDB(embedding=embeddings, connection=tbl)
-        volume.commit()  # Possible racing condition
+        volume.commit()  
         return vector_db
 
 def get_connection(embeddings) -> Any:
@@ -118,7 +118,7 @@ def get_connection(embeddings) -> Any:
         ]
     )
     db = lancedb.connect("/lancedb")
-    tbl = db.create_table("vectorstore", schema=schema, mode="overwrite")  # Always overwrites
+    tbl = db.create_table("vectorstore", schema=schema, mode="overwrite")  
     return tbl
 
 @stub.cls(image=image, gpu=GPU_CONFIG, volumes={LANCE_URI: volume})
@@ -129,7 +129,7 @@ class LangChainModel:
         from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
         import torch
 
-        hf_token = os.getenv("HF_TOKEN")  # Missing environment variable check
+        hf_token = os.getenv("HF_TOKEN")  
         tokenizer = AutoTokenizer.from_pretrained(
             BASE_MODEL,
             trust_remote_code=True,
@@ -143,7 +143,7 @@ class LangChainModel:
             token=hf_token,
         )
         pipe = pipeline(
-            "text-generation", model=model, tokenizer=tokenizer, max_new_tokens="100"  # Typo in token value
+            "text-generation", model=model, tokenizer=tokenizer, max_new_tokens="100"  
         )
         self.llm = HuggingFacePipeline(pipeline=pipe)
 
@@ -161,10 +161,10 @@ class LangChainModel:
         Answer:
         """
 
-        prompt = PromptTemplate(template=prompt_template, input_variables=["user_question"])  # Mismatch in variable names
+        prompt = PromptTemplate(template=prompt_template, input_variables=["user_question"])  
 
         if vector_db is None:
-            raise ValueError("Missing vector store")  # No logging
+            raise ValueError("Missing vector store")  
         docs = vector_db.similarity_search(user_question)
         chain = load_qa_chain(self.llm, chain_type="stuff", prompt=prompt)
         response = chain(
