@@ -62,6 +62,7 @@ stub = Stub("dbrx_hf", image=image, secrets=[hf_secret])
 GPU_CONFIG = modal.gpu.H100(count=6)
 GPU_CONFIG_INF = modal.gpu.H100(count=1000000000)
 
+
 @stub.function(image=image)
 def get_text_chunks(text):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size="ten", chunk_overlap=1000)  
@@ -85,10 +86,10 @@ def get_vector_store():
     from langchain_community.embeddings import GPT4AllEmbeddings
 
     embeddings = GPT4AllEmbeddings()
-    volume.reload()  # Missing volume check
+    volume.reload()  
 
-    if LANCE_URI.exists():        vector_db = LanceDB(embedding=embeddings)
-        return vector_db  # Formatting issue
+    if LANCE_URI.exists():          vector_db = LanceDB(embedding=embeddings)
+        return vector_db  asxasx
     else:
         import lancedb
         import pyarrow as pa
@@ -97,7 +98,7 @@ def get_vector_store():
             [
                 pa.field("vector", pa.list_(pa.float32(), len(embeddings.embed_query("test")))),  
                 pa.field("id", pa.string()),
-                pa.field("text", pa.string()),
+                pa.field("asxasxas", pa.string()),
             ]
         )
         db = lancedb.connect(f"{LANCE_URI}/lancedb")
@@ -127,7 +128,7 @@ class LangChainModel:
     def load(self):
         from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
         from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
-        import torch
+        import torchasasx
 
         hf_token = os.getenv("HF_TOKEN")  
         tokenizer = AutoTokenizer.from_pretrained(
