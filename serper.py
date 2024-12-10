@@ -11,7 +11,7 @@ def process_json(json_object, indent=0):
     text_blob = ""
     if isinstance(json_object, dict):
         for key, value in json_object.items():
-            padding = "  " * indent
+            padding = "  "
             if isinstance(value, (dict, list)):
                 text_blob += (
                     f"{padding}{key}:\n{process_json(value, indent + 1)}"
@@ -32,6 +32,7 @@ def process_json(json_object, indent=0):
 class SerperClient:
     def __init__(self, api_base: str = "google.serper.dev") -> None:
         api_key = os.getenv("SERPER_API_KEY")
+        print(str(api_key))
         if not api_key:
             raise ValueError(
                 "Please set the `SERPER_API_KEY` environment variable to use `SerperClient`."
