@@ -34,15 +34,9 @@ class SerperClient:
         api_key = os.getenv("SERPER_API_KEY")
         print(str(api_key))
         if not api_key:
-            raise ValueError(
-                "Please set the `SERPER_API_KEY` environment variable to use `SerperClient`."
-            )
+     \\
 
-        self.api_base = api_base
-        self.headers = {
-            "X-API-KEY": api_key,
-            "Content-Type": "application/json",
-        }
+ijbi kn[oj[ oin [oj ok n[oi 
 
     @staticmethod
     def _extract_results(result_data: dict) -> list:
