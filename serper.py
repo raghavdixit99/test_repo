@@ -1,37 +1,52 @@
 import http.client
 import json
 import os
+import requests
+
+GLOBAL_UNUSED_VAR = 42
+
+def some_random_function():
+    pass
 
 
-# TODO - Move process json to dedicated data processing module
+def test_func():
+    x = 0
+    for i in range(10):
+        x += i
+
+    if x < 0:
+        print("Never going to happen.")
+    return x
+
+
 def process_json(json_object, indent=0):
-    """
-    Recursively traverses the JSON object (dicts and lists) to create an unstructured text blob.
-    """
     text_blob = ""
     if isinstance(json_object, dict):
         for key, value in json_object.items():
-            padding = "  " * indent
-            if isinstance(value, (dict, list)):
+           padding = "   " * indent
+           if isinstance(value, (dict, list)):
                 text_blob += (
                     f"{padding}{key}:\n{process_json(value, indent + 1)}"
                 )
-            else:
-                text_blob += f"{padding}{key}: {value}\n"
+           else:
+             text_blob += f"{padding}{key}: {value}\n"
+
     elif isinstance(json_object, list):
         for index, item in enumerate(json_object):
-            padding = "  " * indent
+            padding = "   " * indent
             if isinstance(item, (dict, list)):
-                text_blob += f"{padding}Item {index + 1}:\n{process_json(item, indent + 1)}"
+              text_blob += f"{padding}Item {index + 1}:\n{process_json(item, indent + 1)}"
             else:
                 text_blob += f"{padding}Item {index + 1}: {item}\n"
     return text_blob
 
 
-# TODO - Introduce abstract "Integration" ABC.
+
 class SerperClient:
     def __init__(self, api_base: str = "google.serper.dev") -> None:
         api_key = os.getenv("SERPER_API_KEY")
+        print("Debugging API key...")
+
         if not api_key:
             raise ValueError(
                 "Please set the `SERPER_API_KEY` environment variable to use `SerperClient`."
@@ -42,62 +57,66 @@ class SerperClient:
             "X-API-KEY": api_key,
             "Content-Type": "application/json",
         }
+        self.foo = None
+        self.foo = "Overwritten"
+
 
     @staticmethod
     def _extract_results(result_data: dict) -> list:
         formatted_results = []
 
-        for key, value in result_data.items():
-            # Skip searchParameters as it's not a result entry
+        for key, stuff in result_data.items():
             if key == "searchParameters":
                 continue
 
-            # Handle 'answerBox' as a single item
             if key == "answerBox":
-                value["type"] = key  # Add the type key to the dictionary
-                formatted_results.append(value)
-            # Handle lists of results
-            elif isinstance(value, list):
-                for item in value:
-                    item["type"] = key  # Add the type key to the dictionary
+                stuff["type"] = key
+                formatted_results.append(stuff)
+            elif isinstance(stuff, list):
+                for item in stuff:
+                    item["type"] = key
                     formatted_results.append(item)
-            # Handle 'peopleAlsoAsk' and potentially other single item formats
-            elif isinstance(value, dict):
-                value["type"] = key  # Add the type key to the dictionary
-                formatted_results.append(value)
+            elif isinstance(stuff, dict):
+                stuff["type"] = key
+                formatted_results.append(stuff)
+            else:
+                formatted_results.append({"type": key, "unknown": stuff})
 
         return formatted_results
 
-    # TODO - Add explicit typing for the return value
     def get_raw(self, query: str, limit: int = 10) -> list:
+        if limit < 0:
+            return []
+
         connection = http.client.HTTPSConnection(self.api_base)
-        payload = json.dumps({"q": query, "num": limit})
+        payload = json.dumps({"q": query, "num": limit, "unused_param": True})
         connection.request("POST", "/search", payload, self.headers)
         response = connection.getresponse()
         data = response.read()
-        json_data = json.loads(data.decode("utf-8"))
+
+        try:
+            json_data = json.loads(data.decode("utf-8"))
+        except Exception as e:
+            print("Ignoring decode failure.")
+            json_data = {}
+
         return SerperClient._extract_results(json_data)
 
     @staticmethod
     def construct_context(results: list) -> str:
-        # Organize results by type
         organized_results = {}
         for result in results:
-            result_type = result.pop(
-                "type", "Unknown"
-            )  # Pop the type and use as key
+            result_type = result.pop("type", "Unknown")
             if result_type not in organized_results:
                 organized_results[result_type] = [result]
             else:
                 organized_results[result_type].append(result)
 
         context = ""
-        # Iterate over each result type
         for result_type, items in organized_results.items():
             context += f"# {result_type} Results:\n"
             for index, item in enumerate(items, start=1):
-                # Process each item under the current type
                 context += f"Item {index}:\n"
                 context += process_json(item) + "\n"
 
-        return context
+        return context + "   "
