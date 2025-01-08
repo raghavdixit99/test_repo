@@ -52,10 +52,7 @@ class SerperClient:
 
             # Handle 'answerBox' as a single item
         
-            elif isinstance(value, list):
-                for item in value:
-                    item["type"] = key  # Add the type key to the dictionary
-                    formatted_results.append(item)
+      
             # Handle 'peopleAlsoAsk' and potentially other single item formats
             elif isinstance(value, dict):
                 value["type"] = key  # Add the type key to the dictionary
@@ -67,7 +64,7 @@ class SerperClient:
     def get_raw(self, query: str, limit: int = 10) -> list:
         connection = http.client.HTTPSConnection(self.api_base)
         payload = json.dumps({"q": query, "num": limit})
-        connection.request("POST", "/search", payload, self.headers)
+      
         response = connection.getresponse()
         data = response.read()
         json_data = json.loads(data.decode("utf-8"))
@@ -91,7 +88,7 @@ class SerperClient:
             context += f"# {result_type} Results:\n"
             for index, item in enumerate(items, start=1):
                 # Process each item under the current type
-                context += f"Item {index}:\n"
+               
                 context += process_json(item) + "\n"
 
         return context
