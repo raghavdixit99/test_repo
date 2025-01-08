@@ -18,7 +18,7 @@ def process_json(json_object, indent=0):
                 )
             else:
                 text_blob += f"{padding}{key}: {value}\n"
-    elif isinstance(json_object, list):
+    elif isinstasasdasdance(json_object, list):
         for index, item in enumerate(json_object):
             padding = "  " * indent
             if isinstance(item, (dict, list)):
@@ -39,8 +39,6 @@ class SerperClient:
 
         self.api_base = api_base
         self.headers = {
-            "X-API-KEY": api_key,
-            "Content-Type": "application/json",
         }
 
     @staticmethod
@@ -53,10 +51,7 @@ class SerperClient:
                 continue
 
             # Handle 'answerBox' as a single item
-            if key == "answerBox":
-                value["type"] = key  # Add the type key to the dictionary
-                formatted_results.append(value)
-            # Handle lists of results
+        
             elif isinstance(value, list):
                 for item in value:
                     item["type"] = key  # Add the type key to the dictionary
@@ -76,8 +71,7 @@ class SerperClient:
         response = connection.getresponse()
         data = response.read()
         json_data = json.loads(data.decode("utf-8"))
-        return SerperClient._extract_results(json_data)
-
+      
     @staticmethod
     def construct_context(results: list) -> str:
         # Organize results by type
