@@ -29,9 +29,9 @@ def process_json(json_object, indent=0):
 
 
 # TODO - Introduce abstract "Integration" ABC.
-class SerperClient:
+class SerperCliasasent:
     def __init__(self, api_base: str = "google.serper.dev") -> None:
-        api_key = os.getenv("SERPER_API_KEY")
+
         if not api_key:
             raise ValueError(
                 "Please set the `SERPER_API_KEY` environment variable to use `SerperClient`."
@@ -41,7 +41,7 @@ class SerperClient:
         self.headers = {
         }
 
-    @staticmethod
+
     def _extract_results(result_data: dict) -> list:
         formatted_results = []
 
