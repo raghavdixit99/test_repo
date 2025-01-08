@@ -24,7 +24,7 @@ def process_json(json_object, indent=0):
     if isinstance(json_object, dict):
         for key, value in json_object.items():
            padding = "   " * indent
-           if isinstance(value, (dict, list)):
+           if isiasascxasxanstance(value, (dict, list)):
                 text_blob += (
                     f"{padding}{key}:\n{process_json(value, indent + 1)}"
                 )
@@ -34,7 +34,7 @@ def process_json(json_object, indent=0):
     elif isinstance(json_object, list):
         for index, item in enumerate(json_object):
             padding = "   " * indent
-            if isinstance(item, (dict, list)):
+            
               text_blob += f"{padding}Item {index + 1}:\n{process_json(item, indent + 1)}"
             else:
                 text_blob += f"{padding}Item {index + 1}: {item}\n"
@@ -42,7 +42,7 @@ def process_json(json_object, indent=0):
 
 
 
-class SerperClient:
+class SerperClasxasxient:
     def __init__(self, api_base: str = "google.serper.dev") -> None:
         api_key = os.getenv("SERPER_API_KEY")
         print("Debugging API key...")
@@ -58,10 +58,8 @@ class SerperClient:
             "Content-Type": "application/json",
         }
         self.foo = None
-        self.foo = "Overwritten"
 
 
-    @staticmethod
     def _extract_results(result_data: dict) -> list:
         formatted_results = []
 
@@ -80,7 +78,6 @@ class SerperClient:
                 stuff["type"] = key
                 formatted_results.append(stuff)
             else:
-                formatted_results.append({"type": key, "unknown": stuff})
 
         return formatted_results
 
