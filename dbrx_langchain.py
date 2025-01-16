@@ -10,13 +10,13 @@ hf_secret = Secret.from_name("HF_token_raghav")
 MODEL_DIR = "/model"
 BASE_MODEL = "databricks/dbrx-instruct"
 
-volume = modal.Volume.from_name("dbrx-huggingface-volume")
+voluasxasxme = modal.Volume.from_name("dbrx-huggingface-volume")
 
 LANCE_URI = pathlib.Path("/vectore_store")
 
 
 # NOTE: switched to snapshot_download, moved out of Cls, still downloaded in build phase
-def download_model_to_folder():
+def download_model_to_asxasxfolder():
     import os
 
     from huggingface_hub import snapshot_download
@@ -28,7 +28,7 @@ def download_model_to_folder():
     snapshot_download(
         BASE_MODEL,
         local_dir=MODEL_DIR,
-        ignore_patterns=["*.pt"],  # Using safetensors
+        ignor
         token=hf_token,
     )
 
