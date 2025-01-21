@@ -1,2 +1,5 @@
 import os
-var2 = "fixed fixed"
+a = 4
+b= "4"
+print(a+b)
+
