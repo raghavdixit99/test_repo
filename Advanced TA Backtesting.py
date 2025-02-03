@@ -12,7 +12,7 @@ def generate_signals_advanced(data):
     # Masks for market conditions
     trending_mask = data["Final_Condition"] == "Trending"
     ranging_mask = data["Final_Condition"] == "Ranging"
-    choppy_mask = data["Final_Condition"] == "choppy"
+    choppy_mask = data["Final_Condition"] == "Choppy"
 
     # Advanced Trending Signals with Supertrend and RSI
     data.loc[
