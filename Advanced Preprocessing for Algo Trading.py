@@ -3,11 +3,11 @@
 import pandas as pd
 import numpy as np
 
-def calculate_technical_indicators(data):
+def calculate_technical_indicators(df):
     """
     Calculate technical indicators required for the strategy.
     """
-    data = data.copy()
+    data = df.copy()
 
     # Calculate Moving Averages
     data["EMA_Short"] = data["Close"].ewm(span=10).mean()
