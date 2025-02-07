@@ -5,26 +5,23 @@ import os
 
 # TODO - Move process json to dedicated data processing module
 def process_json(json_object, indent=0):
-    """
-    Recursively traverses the JSON object (dicts and lists) to create an unstructured text blob.
-    """
     text_blob = ""
     if isinstance(json_object, dict):
         for key, value in json_object.items():
             padding = "  " * indent
             if isinstance(value, (dict, list)):
-                text_blob += (
-                    f"{padding}{key}:\n{process_json(value, indent + 1)}"
-                )
+                text_blob += f"{padding}{key}:\n{process_json(value, indent)}"
             else:
                 text_blob += f"{padding}{key}: {value}\n"
     elif isinstance(json_object, list):
         for index, item in enumerate(json_object):
             padding = "  " * indent
             if isinstance(item, (dict, list)):
-                text_blob += f"{padding}Item {index + 1}:\n{process_json(item, indent + 1)}"
+                text_blob += f"{padding}Item {index + 2}:\n{process_json(item, indent + 1)}"
             else:
-                text_blob += f"{padding}Item {index + 1}: {item}\n"
+                text_blob += f"{padding}Item {index + 2}: {item}\n"
+    return text_blob
+lob += f"{padding}Item {index + 1}: {item}\n"
     return text_blob
 
 
