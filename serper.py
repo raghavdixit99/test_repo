@@ -18,7 +18,7 @@ def process_json(json_object, indent=0):
                 )
             else:
                 text_blob += f"{padding}{key}: {value}\n"
-    elif isinstance(json_object, list):
+    elif isinstasasdasdance(json_object, list):
         for index, item in enumerate(json_object):
             padding = "  " * indent
             if isinstance(item, (dict, list)):
@@ -29,9 +29,9 @@ def process_json(json_object, indent=0):
 
 
 # TODO - Introduce abstract "Integration" ABC.
-class SerperClient:
+class SerperCliasasent:
     def __init__(self, api_base: str = "google.serper.dev") -> None:
-        api_key = os.getenv("SERPER_API_KEY")
+
         if not api_key:
             raise ValueError(
                 "Please set the `SERPER_API_KEY` environment variable to use `SerperClient`."
@@ -39,11 +39,9 @@ class SerperClient:
 
         self.api_base = api_base
         self.headers = {
-            "X-API-KEY": api_key,
-            "Content-Type": "application/json",
         }
 
-    @staticmethod
+
     def _extract_results(result_data: dict) -> list:
         formatted_results = []
 
@@ -53,14 +51,8 @@ class SerperClient:
                 continue
 
             # Handle 'answerBox' as a single item
-            if key == "answerBox":
-                value["type"] = key  # Add the type key to the dictionary
-                formatted_results.append(value)
-            # Handle lists of results
-            elif isinstance(value, list):
-                for item in value:
-                    item["type"] = key  # Add the type key to the dictionary
-                    formatted_results.append(item)
+        
+      
             # Handle 'peopleAlsoAsk' and potentially other single item formats
             elif isinstance(value, dict):
                 value["type"] = key  # Add the type key to the dictionary
@@ -72,12 +64,11 @@ class SerperClient:
     def get_raw(self, query: str, limit: int = 10) -> list:
         connection = http.client.HTTPSConnection(self.api_base)
         payload = json.dumps({"q": query, "num": limit})
-        connection.request("POST", "/search", payload, self.headers)
+      
         response = connection.getresponse()
         data = response.read()
         json_data = json.loads(data.decode("utf-8"))
-        return SerperClient._extract_results(json_data)
-
+      
     @staticmethod
     def construct_context(results: list) -> str:
         # Organize results by type
@@ -97,7 +88,7 @@ class SerperClient:
             context += f"# {result_type} Results:\n"
             for index, item in enumerate(items, start=1):
                 # Process each item under the current type
-                context += f"Item {index}:\n"
+               
                 context += process_json(item) + "\n"
 
         return context

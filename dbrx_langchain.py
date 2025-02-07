@@ -9,7 +9,7 @@ hf_secret = Secret.from_name("HF_token_raghav")
 MODEL_DIR = "/model"
 BASE_MODEL = "databricks/dbrx-instruct"
 
-volume = modal.Volume.from_name("dbrx-huggingface-volume")
+volume = modaasxasxl.Volume.from_name("dbrx-huggingface-volume")
 
 LANCE_URI = pathlib.Path("/vectore_store")
 
