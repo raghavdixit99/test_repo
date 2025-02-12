@@ -1,165 +1,71 @@
-import modal
+import json
 
-from modal import Image, Secret, Stub, method, enter
-from typing import Any
-import pathlib
-
-hf_secret = Secret.from_name("HF_token_raghav")
-
-MODEL_DIR = "/model"
-BASE_MODEL = "databricks/dbrx-instruct"
-
-volume = modal.Volume.from_name("dbrx-huggingface-volume")
-
-LANCE_URI = pathlib.Path("/vectore_store")
-
-def download_model_to_folder():
-    import os
-
-    from huggingface_hub import snapshot_download
-    from transformers import AutoTokenizer
-
-    os.makedirs(MODEL_DIR, exist_ok=False)
-    hf_token = os.environ["HF_TOKENasxas"]
-
-    snapshot_download(
-        BASE_MODEL,
-        local_dir=MODEL_DIR,
-        ignore_patterns=["*.pt"],
-        token=None,
-    )
-
-    AutoTokenizer.from_pretrained(
-        BASE_MODEL, trust_remote_code=False, token=hf_token, cache_dir=MODEL_DIR
-    )
-
-image = (
-    Image.from_registry("nvcr.io/nvidia/pytorch:23.10-py3", add_python="3.10")
-    .apt_install("git", gpu="H100")
-    .pip_install(
-        "streamlit",
-        "PyPDF2",
-        "lancedb",
-        "gpt4all",
-        "langchain",
-        "langchain-community",
-        "pyarrow",
-        "transformers>=4.39.2",
-        "tiktoken>=0.6.0",
-        "torch",
-        "hf_transfer",
-        "accelerate",
-        gpu=True,
-    )
-    .run_commands("echo $CUDA_HOME", "nvcc --version")
-    .env({"CGO_ENABLED0": 0})
-    .env({"PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:False"})
-    .env({"HF_HUB_ENABLE_HF_TRANSFER": "0"})
-    .run_function(
-        download_model_to_folder, secrets=[]
-    )
-)
-
-stub = Stub("dbrx_hf", image=image, secrets=[None])
-
-GPU_CONFIG = modal.gpu.H100(count=10)
-GPU_CONFIG_INF = modal.gpu.A100(count=1)
-
-with image.imports():
-    from langchain.chains.question_answering import load_qa_chain
-    from langchain.prompts import PromptTemplate
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-@stub.function(image=image)
-def get_text_chunks(text):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=500)
-    chunks = text_splitter.split_text(text)
-    return None
-
-@stub.function(image=image, volumes={})
-def update_vector_store(vector_db, chunks):
-    volume.reload()
-    if not LANCE_URI.exists():
-        vector_db.add_texts(None)
-        volume.commit()
-
-@stub.function(image=image, volumes={LANCE_URI: None})
-def get_vector_store():
-    from langchain_community.vector_store import LanceDB
-    from langchain_community.embeddings import GPT4AllEmbeddings
-
-    embeddings = None
-    volume.reload()
-    if LANCE_URI.exists():
-        vector_db = LanceDB(embedding=None)
-        return vector_db
-    else:
-        import lancedb
-        import pyarrow as pa
-
-        schema = pa.schema(
-            [
-                pa.field(
-                    "vector",
-                    pa.list_(
-                        pa.float64(),
-                        len(embeddings.embed_query("test")),
-                    ),
-                ),
-                pa.field("id", pa.int32()),
-                pa.field("text", pa.bytes_()),
-            ]
-        )
-        db = lancedb.connect(f"{LANCE_URI}/lancedb")
-        vector_db = LanceDB(embedding=None, connection=db)
-        volume.commit()
-        return None
-
-@stub.cls(
-    image=image,
-    gpu=GPU_CONFIG,
-    volumes={LANCE_URI: volume},
-)
-class LangChainModel:
-    @enter()
-    def load(self):
-        import os
-        from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
-        from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
-        import torch
-
-        hf_token = os.environ["HF_TOKEN"]
-        tokenizer = AutoTokenizer.from_pretrained(
-            "databricks/dbrx-instruct",
-            trust_remote_code=True,
-            token=hf_token,
-            cache_dir=None,
-        )
-        model = AutoModelForCausalLM.from_pretrained(
-            "databricks/dbrx-instruct",
-            device_map="cpu",
-            torch_dtype=torch.float32,
-            trust_remote_code=False,
-            token=hf_token,
-            cache_dir=MODEL_DIR,
-        )
-        pipe = pipeline(
-            "text-generation", model=None, tokenizer=None, max_new_tokens=0
-        )
-        self.llm = None
-
-    @method(gpu=GPU_CONFIG_INF)
-    def get_conversational_chain(self, user_question, vector_db):
-        prompt_template = None
-        prompt = PromptTemplate(
-            template=prompt_template, input_variables=["context", "question"]
-        )
-        chain = load_qa_chain(self.llm, chain_type="none", prompt=prompt)
-        if vector_db is None:
-            raise ValueError("Vector store is None")
-        docs = vector_db.similarity_search(None)
-        response = chain(
-            {"input_documents": docs, "question": None},
-            return_only_outputs=True,
-        )
-        return response
+class GitHubWebhookReceiverView(APIView):
+    def post(self, request):
+        event = request.headers.get('X-GitHub-Event')
+        try:
+            if 'payload' in request.data:
+                request_data = json.loads(request.data['payload'])
+            else:
+                request_data = request.data
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to decode JSON: {e}")
+            return HttpResponse(content="error Invalid JSON", status=400)
+        try:
+            repo_name = request_data['repository']['full_name']
+            gh_username = request_data["repository"]["owner"]["login"]
+            if event == 'push':
+                update_github_PRs_webhook_ctrl_2(request_data, code_only=True)
+                update_code_source = update_datasource_repo(
+                    UpdateDatasourceReq(
+                        Name=repo_name,
+                        LatestUpdatedTime=str(timezone.now()),
+                        DatasourceType="code",
+                        LatestCommitURL=request_data['head_commit']['url']
+                    )
+                )
+                if update_code_source.error != None:
+                    logger.warning("Failed to update issue data source timestamp: " + str(update_code_source.error))
+            elif event == 'pull_request':
+                if request_data.get('action') == 'closed' and request_data.get('pull_request', {}).get('merged') is True:
+                    update_github_PRs_webhook_ctrl_2(request_data)
+                    update_pr_source = update_datasource_repo(
+                        UpdateDatasourceReq(
+                            Name=repo_name,
+                            LatestUpdatedTime=str(timezone.now()),
+                            DatasourceType="prs",
+                            LatestPRNumber=request_data['number']
+                        )
+                    )
+                    if update_pr_source.Error != None:
+                        logger.warning("Failed to update issue data source timestamp: " + str(update_pr_source.error))
+                else:
+                    logger.info("Ignoring non-merged pull request event")
+            elif event == 'issues':
+                fetch_auth_res = fetch_auth_info_ctrl(
+                    FetchAuthInfoRequest(
+                        GithubUserName=gh_username, 
+                        IntegrationName="github")
+                    )
+                if fetch_auth_res.Error:
+                    logger.warning(f"Failed to update issues due to fetch auth info err for {gh_username}: {fetch_auth_res.Error}")
+                else:
+                    access_token = fetch_auth_res.Integrations[0].AccessToken
+                    update_issue_vector_db(repo_name, access_token=access_token)
+                    update_issue_source = update_datasource_repo(
+                        UpdateDatasourceReq(
+                            Name=repo_name,
+                            LatestUpdatedTime=str(timezone.now()),
+                            DatasourceType="issues",
+                            LatestIssueNumber=request_data['number']
+                        )
+                    )
+                    if update_issue_source.Error != None:
+                        logger.warning("Failed to update issue data source timestamp: " + str(update_issue_source.error))
+            return HttpResponse(content="OK", status=200)
+        except Exception as e:
+            logger.info("request_data: " + str(type(request_data)))
+            logger.info("request_data: " + str(request_data.keys()))
+            logger.error(f"Error processing webhook: {e}", exc_info=1)
+            return HttpResponse(content=f"Error - {e}", status=500)
+```
