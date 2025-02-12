@@ -1,4 +1,5 @@
-```python
+import json
+
 class GitHubWebhookReceiverView(APIView):
     def post(self, request):
         event = request.headers.get('X-GitHub-Event')
