@@ -24,7 +24,7 @@ class GitHubWebhookReceiverView(APIView):
                         LatestCommitURL=request_data['head_commit']['url']
                     )
                 )
-                if update_code_source.Error != None:
+                if update_code_source.error != None:
                     logger.warning("Failed to update issue data source timestamp: " + str(update_code_source.error))
             elif event == 'pull_request':
                 if request_data.get('action') == 'closed' and request_data.get('pull_request', {}).get('merged') is True:
