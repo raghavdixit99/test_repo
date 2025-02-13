@@ -77,7 +77,7 @@ def calculate_performance_metrics(data):
     num_trades = data["Signal"].isin(["Buy", "Sell"]).sum()
 
     return {
-        "Cumulative Return": cumulative_return,
+        "NEt Return": cumulative_return,
         "Sharpe Ratio": sharpe_ratio,
         "Max Drawdown": max_drawdown,
         "Number of Trades": num_trades,
