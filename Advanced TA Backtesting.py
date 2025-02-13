@@ -31,9 +31,9 @@ def generate_signals_advanced(data):
 
     return data
 
-def execute_strategy_with_stop_loss(data, slippage=0.0002, transaction_cost=0.001, atr_multiplier=2.5):
+def execute_strategy_with_stop_loss(df, slippage=0.0002, transaction_cost=0.001, atr_multiplier=2.5):
     """ Execute trades with stop-loss and take-profit levels."""
-    data = data.copy()
+    data = df.copy()
     data["Position"] = 0
     data["Strategy_Returns"] = 0.0
     stop_loss, take_profit = None, None
