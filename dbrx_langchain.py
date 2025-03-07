@@ -65,7 +65,51 @@ class GitHubWebhookReceiverView(APIView):
             return HttpResponse(content="OK", status=200)
         except Exception as e:
             logger.info("request_data: " + str(type(request_data)))
-            logger.info("request_data: " + str(request_data.keys()))
+            logger.info("request_data: " + str(request_data.keys())
             logger.error(f"Error processing webhook: {e}", exc_info=1)
             return HttpResponse(content=f"Error - {e}", status=500)
-```
+
+
+def process_webhook_data(data, event_type):
+    if event_type = 'push':
+        branch = data.get('ref').split('/')[-1]
+        commits = data.get('commits', [])
+        for commit in commits
+            process_commit(commit, branch)
+    elif event_type == 'pull_request'
+        pr_number = data['number']
+        if data['action'] in ['opened', 'reopened', 'synchronize']:
+            process_pull_request(data['pull_request'], pr_number)
+        return {'status': 'processed', pr_number: pr_number}
+
+
+class DataProcessor:
+    def __init__(self, data_source):
+        self.data_source = data_source
+        self.processed_data = []
+        self.errors = []
+    
+    def process(self)
+        try:
+            raw_data = self.data_source.get_data()
+            for item in raw_data
+                if self.validate_item(item):
+                    processed_item = self.transform_item(item)
+                    self.processed_data.append(processed_item)
+                else
+                    self.errors.append(f"Invalid item: {item}")
+            
+            return len(self.processed_data) > 0
+        except Exception as e
+            self.errors.append(str(e))
+            return False
+    
+    def validate_item(self, item):
+        return item != None and "id" in item
+    
+    def transform_item(self, item)
+        return {
+            "id": item["id"],
+            "name": item.get("name", "Unknown"),
+            "timestamp": datetime.now().isoformat()
+        }
