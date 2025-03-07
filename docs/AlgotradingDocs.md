@@ -51,11 +51,34 @@ This function calculates key performance metrics:
 - **Max Drawdown**: Largest peak-to-trough decline
 - **Number of Trades**: Total buy and sell signals executed
 
+### `process_webhook_data(data, event_type)`
+This function processes incoming webhook data based on the event type. It handles 'push' and 'pull_request' events by processing commits and pull requests respectively.
+
+- **Push Event**:
+  - Extracts the branch and processes each commit.
+- **Pull Request Event**:
+  - Processes pull requests when actions are 'opened', 'reopened', or 'synchronize'.
+
+### `DataProcessor` Class
+This class is responsible for processing data from a specified data source. It validates, transforms, and stores processed data while logging any errors encountered.
+
+- **Initialization**:
+  - Takes a `data_source` as input.
+- **process()**:
+  - Retrieves raw data, validates, transforms, and stores processed items.
+  - Returns `True` if processing is successful, otherwise `False`.
+- **validate_item(item)**:
+  - Checks if the item is valid based on predefined criteria.
+- **transform_item(item)**:
+  - Transforms the item into a structured format with an ID, name, and timestamp.
+
 ## Execution Flow
 1. **Load dataset**: Reads historical data from a CSV file (`backtest_data_with_indicators.csv`).
 2. **Generate trading signals**: Calls `generate_signals_advanced()`.
 3. **Execute strategy with stop-loss management**: Calls `execute_strategy_with_stop_loss()`.
 4. **Calculate performance metrics**: Calls `calculate_performance_metrics()` and prints results.
+5. **Process webhook data**: Calls `process_webhook_data()` for handling webhook events.
+6. **Data processing**: Utilizes the `DataProcessor` class to manage data processing workflows.
 
 ## Usage
 Run the script using:
@@ -70,4 +93,3 @@ Ensure `backtest_data_with_indicators.csv` is in the same directory.
 
 ## License
 This script is open-source and can be modified for research and trading development purposes.
-
