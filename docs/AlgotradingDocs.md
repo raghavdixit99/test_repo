@@ -1,7 +1,7 @@
 # Documentation: Advanced TA-Only Strategy Training Script
 
 ## Overview
-This script implements an advanced technical analysis (TA) trading strategy using indicators such as Supertrend, RSI, Bollinger Bands, and volatility breakouts. It is designed to classify market conditions into trending, ranging, and choppy states and adjust trading signals accordingly. Additionally, it includes a stop-loss mechanism to manage risk and performance metrics to evaluate strategy effectiveness.
+This script implements an advanced technical analysis (TA) trading strategy using indicators such as Supertrend, RSI, Bollinger Bands, and volatility breakouts. It is designed to classify market conditions into trending, ranging, and choppy states and adjust trading signals accordingly. Additionally, it includes a stop-loss mechanism to manage risk and performance metrics to evaluate strategy effectiveness. The script now also includes functionalities for processing webhook events and data processing through the `process_webhook_data` function and the `DataProcessor` class.
 
 ## Requirements
 ### Dependencies
@@ -51,11 +51,24 @@ This function calculates key performance metrics:
 - **Max Drawdown**: Largest peak-to-trough decline
 - **Number of Trades**: Total buy and sell signals executed
 
+### `process_webhook_data(data, event_type)`
+This function handles webhook events, processing data based on the event type. It supports 'push' and 'pull_request' events, processing commits and pull requests accordingly.
+
+### `DataProcessor` Class
+This class is responsible for processing data from a specified data source. It validates, transforms, and stores processed data, handling errors as they occur.
+
+- **Initialization**: Takes a data source as input.
+- **process()**: Processes raw data, validates, and transforms items.
+- **validate_item(item)**: Checks if an item is valid.
+- **transform_item(item)**: Transforms an item into a structured format.
+
 ## Execution Flow
 1. **Load dataset**: Reads historical data from a CSV file (`backtest_data_with_indicators.csv`).
 2. **Generate trading signals**: Calls `generate_signals_advanced()`.
 3. **Execute strategy with stop-loss management**: Calls `execute_strategy_with_stop_loss()`.
 4. **Calculate performance metrics**: Calls `calculate_performance_metrics()` and prints results.
+5. **Process webhook data**: Calls `process_webhook_data()` for handling webhook events.
+6. **Data processing**: Utilizes the `DataProcessor` class to process and validate data.
 
 ## Usage
 Run the script using:
@@ -67,7 +80,7 @@ Ensure `backtest_data_with_indicators.csv` is in the same directory.
 ## Notes
 - Adjust the `atr_multiplier` parameter to fine-tune stop-loss levels.
 - Ensure that input data has all required indicators for accurate signal generation.
+- The `process_webhook_data` function and `DataProcessor` class are designed to handle specific data processing tasks and should be integrated as needed.
 
 ## License
 This script is open-source and can be modified for research and trading development purposes.
-
