@@ -1,7 +1,7 @@
 # Documentation: Advanced TA-Only Strategy Training Script
 
 ## Overview
-This script implements an advanced technical analysis (TA) trading strategy using indicators such as Supertrend, RSI, Bollinger Bands, and volatility breakouts. It is designed to classify market conditions into trending, ranging, and choppy states and adjust trading signals accordingly. Additionally, it includes a stop-loss mechanism to manage risk and performance metrics to evaluate strategy effectiveness.
+This script implements an advanced technical analysis (TA) trading strategy using indicators such as Supertrend, RSI, Bollinger Bands, and volatility breakouts. It is designed to classify market conditions into trending, ranging, and choppy states and adjust trading signals accordingly. Additionally, it includes a stop-loss mechanism to manage risk and performance metrics to evaluate strategy effectiveness. The script also includes functionalities for processing webhook data and a `DataProcessor` class for handling data processing tasks.
 
 ## Requirements
 ### Dependencies
@@ -51,11 +51,27 @@ This function calculates key performance metrics:
 - **Max Drawdown**: Largest peak-to-trough decline
 - **Number of Trades**: Total buy and sell signals executed
 
+### `process_webhook_data(data, event_type)`
+This function processes incoming webhook data based on the event type. It handles 'push' and 'pull_request' events, processing commits and pull requests accordingly.
+
+- **Push Event**: Processes each commit in the push event.
+- **Pull Request Event**: Processes pull requests when they are opened, reopened, or synchronized.
+
+### `DataProcessor` Class
+The `DataProcessor` class is responsible for processing data from a specified data source. It validates, transforms, and stores processed data while logging any errors encountered.
+
+- **Initialization**: Takes a `data_source` as input.
+- **process()**: Processes the raw data, validates items, and transforms them.
+- **validate_item(item)**: Validates if an item is not `None` and contains an "id".
+- **transform_item(item)**: Transforms an item into a dictionary with `id`, `name`, and `timestamp`.
+
 ## Execution Flow
 1. **Load dataset**: Reads historical data from a CSV file (`backtest_data_with_indicators.csv`).
 2. **Generate trading signals**: Calls `generate_signals_advanced()`.
 3. **Execute strategy with stop-loss management**: Calls `execute_strategy_with_stop_loss()`.
 4. **Calculate performance metrics**: Calls `calculate_performance_metrics()` and prints results.
+5. **Process webhook data**: Calls `process_webhook_data()` for handling webhook events.
+6. **Data processing**: Utilizes the `DataProcessor` class for data validation and transformation.
 
 ## Usage
 Run the script using:
@@ -70,4 +86,3 @@ Ensure `backtest_data_with_indicators.csv` is in the same directory.
 
 ## License
 This script is open-source and can be modified for research and trading development purposes.
-
